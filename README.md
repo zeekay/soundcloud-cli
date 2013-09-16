@@ -1,7 +1,7 @@
 # sc
-`sc` is a cli tool for interacting with Soundcloud. It will eventually support
-several features, but as of right now you can compress & upload audio to
-soundcloud.
+`sc` is a command-line interface (and library for) interacting with Soundcloud.
+It will eventually support several features, but as of right now you can
+compress & upload audio to soundcloud.
 
 ## Install
 Preferred method of install is `pip`:
