@@ -1,3 +1,3 @@
 #!/usr/bin/env python2
-import sc
-sc.main()
+from sc import cli
+cli.main()
