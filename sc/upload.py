@@ -55,16 +55,32 @@ class Progressbar(object):
         sys.stdout.flush()
 
 
-def upload(filename, access_token, title=None, sharing='private'):
+def upload(filename, access_token, sharing='private', downloadable=True, title=None, description=None, genre=None, tag_list=[], artwork=None):
     if not title:
         title = os.path.splitext(os.path.basename(filename))[0]
 
+    filename = os.path.expanduser(filename)
+
     data = {
         'oauth_token': access_token,
-        'track[title]': title,
+        'track[asset_data]': (filename, open(filename, 'rb').read()),
         'track[sharing]': sharing,
-        'track[asset_data]': ("honey.mp3", open('honey.mp3', 'rb').read()),
+        'track[downloadable]': downloadable,
+        'track[title]': title,
     }
+
+    if description:
+        data['track[description]'] = description
+
+    if genre:
+        data['track[genre]'] = genre
+
+    if tag_list:
+        data['track[tag_list]'] = ' '.join(tag_list)
+
+    if artwork:
+        artwork = os.path.expanduser(artwork)
+        data['track[artwork_data'] = (artwork, open(artwork, 'rb').read())
 
     (data, content_type) = requests.packages.urllib3.filepost.encode_multipart_formdata(data)
 
@@ -72,10 +88,17 @@ def upload(filename, access_token, title=None, sharing='private'):
         "Content-Type": content_type
     }
 
-    body = BufferReader(data, Progressbar(filename))
+    body = BufferReader(data, Progressbar(', '.join(f for f in [filename, artwork] if f)))
 
-    res = requests.post('https://api.soundcloud.com/tracks.json', data=body, headers=headers).json()
+    res = requests.post('https://api.soundcloud.com/tracks.json', data=body, headers=headers)
     print
+
+    if res.ok:
+        res = res.json()
+    else:
+        print res.status_code
+        print res.headers
+        print res.text
 
     if sharing == 'private':
         secret_token = res['secret_uri'].split('secret_token=')[1]

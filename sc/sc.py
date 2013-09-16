@@ -53,15 +53,9 @@ def compress_track(filename, artist=None, title='', album='', year=DEFAULT_YEAR,
 
 
 
-def upload_track(filename, title=None, sharing='private'):
-    filename = os.path.expanduser(filename)
-
+def upload_track(filename, **kwargs):
     access_token = get_settings()['access_token']
-
-    if not title:
-        title = os.path.splitext(os.path.basename(filename))[0]
-
-    return upload(filename, access_token, title=title, sharing=sharing)
+    return upload(filename, access_token, **kwargs)
 
 
 def command_upload(args):
@@ -80,7 +74,19 @@ def command_upload(args):
     else:
         sharing = 'private'
 
-    res = upload_track(args.filename, title=args.title, sharing=sharing)
+    if args.tags:
+        tag_list = [x.strip() for x in args.tags.split(',')]
+    else:
+        tag_list = []
+
+    res = upload_track(args.filename, sharing=sharing,
+                                      downloadable=args.downloadable,
+                                      title=args.title,
+                                      description=args.description,
+                                      genre=args.genre,
+                                      tag_list=tag_list,
+                                      artwork=args.artwork)
+
     print res['permalink_url']
 
 
@@ -106,18 +112,24 @@ def main():
     parser = argparse.ArgumentParser()
     subparsers = parser.add_subparsers()
 
-    upload_parser = subparsers.add_parser('upload', help='Upload track to soundcloud')
-    upload_parser.add_argument('filename', action='store', help='File to upload')
-    upload_parser.add_argument('--public', action='store_true', help='Make track public')
-    upload_parser.add_argument('--compress', action='store_true', help='Compress file')
-    upload_parser.add_argument('--no-compress', action='store_false', help='Compress file')
+    upload_parser = subparsers.add_parser('upload', help='upload track to soundcloud')
+    upload_parser.add_argument('filename', action='store', help='filename to upload')
+    upload_parser.add_argument('--public', action='store_true', help='make track public')
+    upload_parser.add_argument('--compress', action='store_true', help='compress file')
+    upload_parser.add_argument('--no-compress', action='store_false', help='do not compress file')
     upload_parser.set_defaults(compress=True)
-    upload_parser.add_argument('--bitrate', default=320, help='Compress file')
-    upload_parser.add_argument('--tags', help='Tags for track')
+    upload_parser.add_argument('--downloadable', action='store_true', help='allow downloads')
+    upload_parser.add_argument('--no-downloadable', action='store_false', help='disallow downloads')
+    upload_parser.set_defaults(downloadable=True)
+    upload_parser.add_argument('--bitrate', default=320, help='bitrate for compression')
     upload_parser.add_argument('--artist', help='id3 title')
     upload_parser.add_argument('--title', help='id3 title')
     upload_parser.add_argument('--album', help='id3 album')
     upload_parser.add_argument('--year', default=DEFAULT_YEAR, help='id3 year')
+    upload_parser.add_argument('--description', help='description of track')
+    upload_parser.add_argument('--genre', help='genre of track')
+    upload_parser.add_argument('--tags', help='comma separated list of tags')
+    upload_parser.add_argument('--artwork', help='artwork to use for song')
     upload_parser.set_defaults(command=command_upload)
 
     auth_parser = subparsers.add_parser('auth', help='Authenticate and save access token')
