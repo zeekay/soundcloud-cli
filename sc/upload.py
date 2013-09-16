@@ -3,6 +3,7 @@ import sys
 from io import BytesIO
 import requests
 
+from settings import get_settings
 
 class CancelledError(Exception):
     def __init__(self, msg):
@@ -55,7 +56,9 @@ class Progressbar(object):
         sys.stdout.flush()
 
 
-def upload(filename, access_token, sharing='private', downloadable=True, title=None, description=None, genre=None, tag_list=[], artwork=None):
+def upload(filename, sharing='private', downloadable=True, title=None, description=None, genre=None, tag_list=[], artwork=None, callback=Progressbar):
+    access_token = get_settings()['access_token']
+
     if not title:
         title = os.path.splitext(os.path.basename(filename))[0]
 
@@ -88,7 +91,7 @@ def upload(filename, access_token, sharing='private', downloadable=True, title=N
         "Content-Type": content_type
     }
 
-    body = BufferReader(data, Progressbar(', '.join(f for f in [filename, artwork] if f)))
+    body = BufferReader(data, callback=callback(', '.join(f for f in [filename, artwork] if f)))
 
     res = requests.post('https://api.soundcloud.com/tracks.json', data=body, headers=headers)
     print
@@ -99,6 +102,7 @@ def upload(filename, access_token, sharing='private', downloadable=True, title=N
         print res.status_code
         print res.headers
         print res.text
+        return
 
     if sharing == 'private':
         secret_token = res['secret_uri'].split('secret_token=')[1]
