@@ -7,7 +7,6 @@ upload:
 readme:
 	pandoc --from=markdown --to=rst --output=README.rst README.md
 
-
 tag:
 	perl -p -i -e '/\d+\.\d+\.(\d+)/; my $$x = $$1+1; s/(\d+\.\d+\.)(\d+)/$$1.$$x/ge' sc/__init__.py
 	export version=`python setup.py --version`; \
