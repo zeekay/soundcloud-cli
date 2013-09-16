@@ -11,6 +11,8 @@ def grep(attrname):
 setup(
     name='sc',
     version=grep('__version__'),
+    author='Zach Kelling',
+    author_email='zk@monoid.io',
     url='https://github.com/zeekay/sc',
     description='Soundcloud CLI app',
     packages=find_packages(),

@@ -1,2 +1,4 @@
 *.pyc
 sc.egg-info/*
+build/
+dist/
