@@ -1,7 +1,6 @@
 import json
 import sys
-from sc import get_settings, compress_track, get_access_token, DEFAULT_YEAR, SC_CONF
-from upload import upload
+from sc import compress_track, upload_track, get_access_token, DEFAULT_YEAR, SC_CONF
 from utils import copy_to_clipboard, open_browser
 from __init__ import __version__
 
@@ -23,8 +22,6 @@ def command_auth(args):
 
 
 def command_upload(args):
-    access_token = get_settings()['access_token']
-
     if args.compress and args.filename.endswith('.wav'):
         print 'compressing file...'
         compress_track(args.filename, bitrate=args.bitrate,
@@ -45,14 +42,13 @@ def command_upload(args):
     else:
         tag_list = []
 
-    res = upload(args.filename, access_token, sharing=sharing,
-                                              downloadable=args.downloadable,
-                                              title=args.title,
-                                              description=args.description,
-                                              genre=args.genre,
-                                              tag_list=tag_list,
-                                              artwork=args.artwork)
-
+    res = upload_track(args.filename, sharing=sharing,
+                                      downloadable=args.downloadable,
+                                      title=args.title,
+                                      description=args.description,
+                                      genre=args.genre,
+                                      tag_list=tag_list,
+                                      artwork=args.artwork)
 
     url = res['permalink_url']
 
