@@ -56,8 +56,8 @@ def command_upload(args):
     url = res['permalink_url']
 
     print url
-    copy_to_clipboard(url)
     open_browser(url)
+    copy_to_clipboard(url)
 
 
 def main():
