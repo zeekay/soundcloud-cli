@@ -48,7 +48,7 @@ def compress_track(filename, artist=None, title='', album='', year=DEFAULT_YEAR,
     if not artist:
         artist = get_settings()['username']
 
-    os.system('lame -b %d --tt "%s" --ta "%s" --tl "%s" --ty %s %s' % (bitrate, title, artist, album, year, filename))
+    os.system('lame -b %d --tt "%s" --ta "%s" --tl "%s" --ty %s "%s"' % (bitrate, title, artist, album, year, filename))
 
 
 def upload_gen(filename):
@@ -95,7 +95,7 @@ def upload_track(filename, title=None, sharing='private'):
 
 
 def command_upload(args):
-    if not args.no_compress and args.filename.endswith('.wav'):
+    if args.compress and args.filename.endswith('.wav'):
         print 'compressing file...'
         compress_track(args.filename, bitrate=args.bitrate,
                                       title=args.title,
@@ -103,7 +103,7 @@ def command_upload(args):
                                       album=args.album,
                                       year=args.year)
 
-        args.filename.replace('.wav', '.mp3')
+        args.filename = args.filename.replace('.wav', '.mp3')
 
     if args.public:
         sharing = 'public'
@@ -139,7 +139,9 @@ def main():
     upload_parser = subparsers.add_parser('upload', help='Upload track to soundcloud')
     upload_parser.add_argument('filename', action='store', help='File to upload')
     upload_parser.add_argument('--public', action='store_true', help='Make track public')
-    upload_parser.add_argument('--no-compress', action='store_true', help='Compress file')
+    upload_parser.add_argument('--compress', action='store_true', help='Compress file')
+    upload_parser.add_argument('--no-compress', action='store_false', help='Compress file')
+    upload_parser.set_defaults(compress=True)
     upload_parser.add_argument('--bitrate', default=320, help='Compress file')
     upload_parser.add_argument('--tags', help='Tags for track')
     upload_parser.add_argument('--artist', help='id3 title')
