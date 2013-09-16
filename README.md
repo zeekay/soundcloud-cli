@@ -17,14 +17,10 @@ username based on your system account name:
     Saved access_token.
 
 ## Usage
-By default if you pass `sc` a filename it'll assume you want to upload it. You
-can also explicitly use the upload command:
-
-    $ sc upload mysong.mp3
-    uploading mysong.mp3 [============                                      ] 25%
-
-If you pass a `.wav` file, sc will by default try to compress it. By default
-uploaded audio will be set to private, and you'll get a secret link for sharing:
+You can use the `sc upload` command to upload audio to Soundcloud. If you
+specify a `.wav` file `sc` will compress the audio for you (if `lame` is
+installed). By default uploaded audio is set to private, and you'll get the secret
+link for sharing:
 
     $ sc upload mysong.mp3
     uploading mysong.mp3 [==================================================] 100%
