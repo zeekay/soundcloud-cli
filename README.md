@@ -1,5 +1,5 @@
 # sc
-`sc` is a command-line interface Soundcloud. It allows you to compress and
+`sc` is a command-line interface for Soundcloud. It allows you to compress and
 upload audio to Soundcloud, and will eventually support many other useful
 features.
 
@@ -8,13 +8,15 @@ Preferred method of install is `pip`:
 
     $ pip install sc-cli
 
-Then run `sc auth` to authenticate with Soundcloud: `sc` will try to guess your
-username based on your system account name:
+After installing `sc`, you should authenticate with Soundcloud.
 
     $ sc auth
     Enter username (zk): requite
     Enter password:
     Saved access_token.
+
+You can run `sc auth` to change users later.
+
 
 ## Usage
 You can use the `sc upload` command to upload audio to Soundcloud. If you
