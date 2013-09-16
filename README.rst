@@ -6,4 +6,7 @@ sc
 Install
 -------
 
-``pip install sc-cli``
+::
+
+    pip install sc-cli
+
