@@ -1,12 +1,6 @@
-import json
-import sys
-from sc import compress_track, upload_track, get_access_token, DEFAULT_YEAR, SC_CONF
-from utils import copy_to_clipboard, open_browser
-from __init__ import __version__
-
-
 def command_auth(args):
     import getpass
+    from settings import auth
 
     _username = getpass.getuser()
     username = raw_input('Enter username (%s): ' % _username)
@@ -15,20 +9,22 @@ def command_auth(args):
 
     password = getpass.getpass('Enter password: ')
 
-    with open(SC_CONF, 'w') as f:
-        json.dump({'username': username, 'access_token': get_access_token(username, password)}, f)
-
+    auth(username, password)
     print 'Saved access_token.'
 
 
 def command_upload(args):
+    from upload import upload
+    from utils import copy_to_clipboard, open_browser
+
     if args.compress and args.filename.endswith('.wav'):
-        print 'compressing file...'
-        compress_track(args.filename, bitrate=args.bitrate,
-                                      title=args.title,
-                                      artist=args.artist,
-                                      album=args.album,
-                                      year=args.year)
+        from lame import compress
+
+        compress(args.filename, bitrate=args.bitrate,
+                                title=args.title,
+                                artist=args.artist,
+                                album=args.album,
+                                year=args.year)
 
         args.filename = args.filename.replace('.wav', '.mp3')
 
@@ -42,7 +38,7 @@ def command_upload(args):
     else:
         tag_list = []
 
-    res = upload_track(args.filename, sharing=sharing,
+    res = upload(args.filename, sharing=sharing,
                                       downloadable=args.downloadable,
                                       title=args.title,
                                       description=args.description,
@@ -59,6 +55,9 @@ def command_upload(args):
 
 def main():
     import argparse
+    import sys
+
+    from __init__ import __version__
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
@@ -81,7 +80,7 @@ def main():
     upload_parser.add_argument('--artist', help='id3 title')
     upload_parser.add_argument('--title', help='id3 title')
     upload_parser.add_argument('--album', help='id3 album')
-    upload_parser.add_argument('--year', default=DEFAULT_YEAR, help='id3 year')
+    upload_parser.add_argument('--year', help='id3 year')
     upload_parser.add_argument('--description', help='description of track')
     upload_parser.add_argument('--genre', help='genre of track')
     upload_parser.add_argument('--tags', help='comma separated list of tags')

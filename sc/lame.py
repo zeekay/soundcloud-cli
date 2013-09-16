@@ -3,20 +3,41 @@ import re
 import subprocess
 import sys
 
+from datetime import date
+from settings import get_settings
+
+DEFAULT_YEAR  = date.today().year
 PROGRESS_RE = re.compile(r'\((\s?\d+)%\)')
+
 
 class Progressbar(object):
     def __init__(self, filename=None):
         self.filename = filename
 
     def __call__(self, line):
-        percent = int(PROGRESS_RE.search(line).groups()[0])
-        bars    = percent / 2
-        sys.stdout.write('\rencoding {0} [{1}{2}] {3}%'.format(self.filename, '=' * bars, ' ' * (50 - bars), percent))
+        percent   = int(PROGRESS_RE.search(line).groups()[0])
+        bars      = percent / 2
+        done      = '=' * bars
+        remaining = ' ' * (50 - bars)
+
+        sys.stdout.write('\rencoding {0} [{1}{2}] {3}%'.format(self.filename, done, remaining, percent))
         sys.stdout.flush()
 
 
-def encode(filename, bitrate=320, callback=None):
+def compress(filename, artist=None, title=None, album=None, year=None, bitrate=320, callback=Progressbar):
+    if artist is None:
+        artist = get_settings()['username']
+
+    if title is None:
+        title = os.path.splitext(os.path.basename(filename))[0]
+
+    if album is None:
+        album = 'work in progress'
+
+    if year is None:
+        year = DEFAULT_YEAR
+
+    # expand possible tilde
     filename = os.path.expanduser(filename)
 
     # support CBR and VBR bitrate encoding
@@ -25,10 +46,23 @@ def encode(filename, bitrate=320, callback=None):
     else:
         bitrate_switch = '-V'
 
-    proc = subprocess.Popen(['lame', bitrate_switch, str(bitrate), filename, '--nohist'], stderr=subprocess.PIPE)
+    args = [
+        'lame',
+        '--nohist',
+        bitrate_switch, str(bitrate),
+        '--tt', title,
+        '--ta', artist,
+        '--tl', album,
+        '--ty', str(year),
+        filename
+    ]
+
+    proc = subprocess.Popen(args, stderr=subprocess.PIPE)
 
     start = False
     line = ''
+    callback = callback(filename=os.path.basename(filename))
+
     while True:
         if not start:
             buf = proc.stderr.read(1)
@@ -40,11 +74,7 @@ def encode(filename, bitrate=320, callback=None):
         buf = proc.stderr.read(1)
         line += buf
         if buf == '\r':
-            if callback:
-                callback(line)
+            callback(line)
             line = ''
         elif buf == '':
             break
-
-if __name__ == '__main__':
-    encode('~/Desktop/honey.wav', callback=Progressbar('honey.wav'))

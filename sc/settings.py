@@ -1,15 +1,12 @@
 import json
 import os
 import sys
-from datetime import date
 
 import soundcloud
-from upload import upload
 
 CLIENT_ID     = 'ffc80dc8b5bd435a15f9808724f73c40'
 CLIENT_SECRET = 'b299b6681e00dfd9f5015639c7f5fe29'
-SC_CONF       = os.path.expanduser('~/.sc')
-DEFAULT_YEAR  = date.today().year
+SC_CONF = os.path.expanduser('~/.sc')
 
 
 def get_access_token(username, password):
@@ -22,6 +19,12 @@ def get_access_token(username, password):
     )
 
     return client.access_token
+
+
+def auth(username, password):
+    with open(SC_CONF, 'w') as f:
+        access_token = get_access_token(username, password)
+        json.dump({'username': username, 'access_token': access_token}, f)
 
 
 def get_settings():
@@ -44,18 +47,3 @@ def get_client(access_token=None):
         access_token = get_settings()['access_token']
 
     return soundcloud.Client(access_token=access_token)
-
-
-def compress_track(filename, artist=None, title=None, album='work in progress', year=DEFAULT_YEAR, bitrate=320):
-    if not artist:
-        artist = get_settings()['username']
-
-    if not title:
-        title = os.path.splitext(os.path.basename(filename))[0]
-
-    os.system('lame -b %d --tt "%s" --ta "%s" --tl "%s" --ty %s "%s"' % (bitrate, title, artist, album, year, filename))
-
-def upload_track(filename, **kwargs):
-    access_token = get_settings()['access_token']
-
-    return upload(filename, access_token, **kwargs)
