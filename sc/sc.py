@@ -10,6 +10,7 @@ CLIENT_SECRET = 'b299b6681e00dfd9f5015639c7f5fe29'
 SC_CONF       = os.path.expanduser('~/.sc')
 DEFAULT_YEAR  = date.today().year
 
+
 def get_access_token(username, password):
     client = soundcloud.Client(
         client_id=CLIENT_ID,
@@ -21,17 +22,19 @@ def get_access_token(username, password):
     return client.access_token
 
 def get_settings():
-    if get_settings._cached_result:
-        return get_settings._cached_result
+    if get_settings._cache:
+        return get_settings._cache
 
     if not os.path.exists(SC_CONF):
         print 'Run auth command to authenticate and save access token.'
         sys.exit(1)
 
     with open(SC_CONF) as f:
-        get_settings._cached_result = settings = json.load(f)
+        get_settings._cache = settings = json.load(f)
 
     return settings
+
+get_settings._cache = None
 
 
 def get_client(access_token=None):
@@ -48,6 +51,27 @@ def compress_track(filename, artist=None, title='', album='', year=DEFAULT_YEAR,
     os.system('lame -b %d --tt "%s" --ta "%s" --tl "%s" --ty %s %s' % (bitrate, title, artist, album, year, filename))
 
 
+def upload_gen(filename):
+    """
+    Wrap a file in a progress bar and spit out progress as it's uploaded.
+    """
+    with open(filename, 'rb') as f:
+        uploaded = 0
+        f.seek(0, 2)
+        total = f.tell()
+        total_mb = float(total) / 1024 / 1024
+        f.seek(0)
+
+        for data in f:
+            uploaded += len(data)
+            uploaded_mb = float(uploaded) / 1024 / 1024
+            done = int(50 * uploaded / total)
+            sys.stdout.write("\r[%s%s] %.2f / %.2f" % ('=' * done, ' ' * (50 - done), uploaded_mb, total_mb))
+            sys.stdout.flush()
+            yield data
+        print
+
+
 def upload_track(filename, title=None, sharing='private'):
     filename = os.path.expanduser(filename)
     client = get_client()
@@ -55,22 +79,24 @@ def upload_track(filename, title=None, sharing='private'):
     if not title:
         title = os.path.splitext(os.path.basename(filename))[0]
 
-    with open(filename, 'rb') as f:
-        track = client.post('/tracks', track={
-            'title': title,
-            'asset_data': f,
-            'sharing': sharing,
-        })
+    print 'uploading {0}...'.format(filename)
+
+    track = client.post('/tracks', track={
+        'title': title,
+        'asset_data': open(filename, 'rb'),
+        'sharing': sharing,
+    })
 
     if sharing == 'private':
-        secret_token = track.secret_uri.split('secret_token=')[0]
+        secret_token = track.secret_uri.split('secret_token=')[1]
         track.permalink_url = track.permalink_url + '/' + secret_token
 
     return track
 
 
 def command_upload(args):
-    if args.filename.endswith('.wav'):
+    if not args.no_compress and args.filename.endswith('.wav'):
+        print 'compressing file...'
         compress_track(args.filename, bitrate=args.bitrate,
                                       title=args.title,
                                       artist=args.artist,
@@ -113,7 +139,7 @@ def main():
     upload_parser = subparsers.add_parser('upload', help='Upload track to soundcloud')
     upload_parser.add_argument('filename', action='store', help='File to upload')
     upload_parser.add_argument('--public', action='store_true', help='Make track public')
-    upload_parser.add_argument('--no-compress', action='store_false', help='Compress file')
+    upload_parser.add_argument('--no-compress', action='store_true', help='Compress file')
     upload_parser.add_argument('--bitrate', default=320, help='Compress file')
     upload_parser.add_argument('--tags', help='Tags for track')
     upload_parser.add_argument('--artist', help='id3 title')
