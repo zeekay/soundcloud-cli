@@ -9,7 +9,7 @@ def grep(attrname):
     return strval
 
 setup(
-    name='sc',
+    name='sc-cli',
     version=grep('__version__'),
     author='Zach Kelling',
     author_email='zk@monoid.io',
