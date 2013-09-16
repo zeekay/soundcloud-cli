@@ -4,6 +4,7 @@ import sys
 from datetime import date
 
 import soundcloud
+from upload import upload
 
 CLIENT_ID     = 'ffc80dc8b5bd435a15f9808724f73c40'
 CLIENT_SECRET = 'b299b6681e00dfd9f5015639c7f5fe29'
@@ -51,47 +52,16 @@ def compress_track(filename, artist=None, title='', album='', year=DEFAULT_YEAR,
     os.system('lame -b %d --tt "%s" --ta "%s" --tl "%s" --ty %s "%s"' % (bitrate, title, artist, album, year, filename))
 
 
-def upload_gen(filename):
-    """
-    Wrap a file in a progress bar and spit out progress as it's uploaded.
-    """
-    with open(filename, 'rb') as f:
-        uploaded = 0
-        f.seek(0, 2)
-        total = f.tell()
-        total_mb = float(total) / 1024 / 1024
-        f.seek(0)
-
-        for data in f:
-            uploaded += len(data)
-            uploaded_mb = float(uploaded) / 1024 / 1024
-            done = int(50 * uploaded / total)
-            sys.stdout.write("\r[%s%s] %.2f / %.2f" % ('=' * done, ' ' * (50 - done), uploaded_mb, total_mb))
-            sys.stdout.flush()
-            yield data
-        print
-
 
 def upload_track(filename, title=None, sharing='private'):
     filename = os.path.expanduser(filename)
-    client = get_client()
+
+    access_token = get_settings()['access_token']
 
     if not title:
         title = os.path.splitext(os.path.basename(filename))[0]
 
-    print 'uploading {0}...'.format(filename)
-
-    track = client.post('/tracks', track={
-        'title': title,
-        'asset_data': open(filename, 'rb'),
-        'sharing': sharing,
-    })
-
-    if sharing == 'private':
-        secret_token = track.secret_uri.split('secret_token=')[1]
-        track.permalink_url = track.permalink_url + '/' + secret_token
-
-    return track
+    return upload(filename, access_token, title=title, sharing=sharing)
 
 
 def command_upload(args):
@@ -110,8 +80,8 @@ def command_upload(args):
     else:
         sharing = 'private'
 
-    track = upload_track(args.filename, title=args.title, sharing=sharing)
-    print track.permalink_url
+    res = upload_track(args.filename, title=args.title, sharing=sharing)
+    print res['permalink_url']
 
 
 def command_auth(args):
