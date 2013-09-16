@@ -1,4 +1,4 @@
 *.pyc
-sc_cli.egg-info/*
+*.egg-info/
 build/
 dist/
