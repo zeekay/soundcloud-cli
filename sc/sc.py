@@ -18,9 +18,11 @@ def get_access_token(username, password):
         client_secret=CLIENT_SECRET,
         username=username,
         password=password,
+        scope='non-expiring',
     )
 
     return client.access_token
+
 
 def get_settings():
     if get_settings._cache:
@@ -34,7 +36,6 @@ def get_settings():
         get_settings._cache = settings = json.load(f)
 
     return settings
-
 get_settings._cache = None
 
 
@@ -52,13 +53,9 @@ def compress_track(filename, artist=None, title='', album='', year=DEFAULT_YEAR,
     os.system('lame -b %d --tt "%s" --ta "%s" --tl "%s" --ty %s "%s"' % (bitrate, title, artist, album, year, filename))
 
 
-
-def upload_track(filename, **kwargs):
-    access_token = get_settings()['access_token']
-    return upload(filename, access_token, **kwargs)
-
-
 def command_upload(args):
+    access_token = get_settings()['access_token']
+
     if args.compress and args.filename.endswith('.wav'):
         print 'compressing file...'
         compress_track(args.filename, bitrate=args.bitrate,
@@ -79,13 +76,13 @@ def command_upload(args):
     else:
         tag_list = []
 
-    res = upload_track(args.filename, sharing=sharing,
-                                      downloadable=args.downloadable,
-                                      title=args.title,
-                                      description=args.description,
-                                      genre=args.genre,
-                                      tag_list=tag_list,
-                                      artwork=args.artwork)
+    res = upload(args.filename, access_token, sharing=sharing,
+                                              downloadable=args.downloadable,
+                                              title=args.title,
+                                              description=args.description,
+                                              genre=args.genre,
+                                              tag_list=tag_list,
+                                              artwork=args.artwork)
 
     print res['permalink_url']
 
@@ -141,6 +138,3 @@ def main():
 
     args = parser.parse_args()
     args.command(args)
-
-if __name__ == '__main__':
-    main()
