@@ -20,7 +20,7 @@ class Progressbar(object):
         done      = '=' * bars
         remaining = ' ' * (50 - bars)
 
-        sys.stdout.write('\rencoding {0} [{1}{2}] {3}%'.format(self.filename, done, remaining, percent))
+        sys.stdout.write('\rcompressing {0} [{1}{2}] {3}%'.format(self.filename, done, remaining, percent))
         sys.stdout.flush()
 
 
