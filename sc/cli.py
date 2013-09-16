@@ -1,3 +1,7 @@
+import os
+import sys
+
+
 def command_auth(args):
     import getpass
     from settings import auth
@@ -25,6 +29,9 @@ def command_upload(args):
                                 artist=args.artist,
                                 album=args.album,
                                 year=args.year)
+        # clear line
+        rows, columns = os.popen('stty size', 'r').read().split()
+        sys.stdout.write('\r' + ' ' * int(columns))
 
         args.filename = args.filename.replace('.wav', '.mp3')
 
@@ -39,12 +46,12 @@ def command_upload(args):
         tag_list = []
 
     res = upload(args.filename, sharing=sharing,
-                                      downloadable=args.downloadable,
-                                      title=args.title,
-                                      description=args.description,
-                                      genre=args.genre,
-                                      tag_list=tag_list,
-                                      artwork=args.artwork)
+                                downloadable=args.downloadable,
+                                title=args.title,
+                                description=args.description,
+                                genre=args.genre,
+                                tag_list=tag_list,
+                                artwork=args.artwork)
 
     url = res['permalink_url']
 
@@ -55,7 +62,6 @@ def command_upload(args):
 
 def main():
     import argparse
-    import sys
 
     from __init__ import __version__
 
