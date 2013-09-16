@@ -5,6 +5,7 @@ from upload import upload
 from utils import copy_to_clipboard, open_browser
 from __init__ import __version__
 
+
 def command_auth(args):
     import getpass
 
@@ -68,6 +69,9 @@ def main():
 
     subparsers = parser.add_subparsers()
 
+    auth_parser = subparsers.add_parser('auth', help='authenticate and save access token')
+    auth_parser.set_defaults(command=command_auth)
+
     upload_parser = subparsers.add_parser('upload', help='upload track to soundcloud')
     upload_parser.add_argument('filename', action='store', help='filename to upload')
     upload_parser.add_argument('--public', action='store_true', help='make track public')
@@ -87,9 +91,6 @@ def main():
     upload_parser.add_argument('--tags', help='comma separated list of tags')
     upload_parser.add_argument('--artwork', help='artwork to use for song')
     upload_parser.set_defaults(command=command_upload)
-
-    auth_parser = subparsers.add_parser('auth', help='authenticate and save access token')
-    auth_parser.set_defaults(command=command_auth)
 
     # default to upload command
     if sys.argv[1:]:
