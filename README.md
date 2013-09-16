@@ -59,3 +59,28 @@ with `--help`:
       --genre GENRE         genre of track
       --tags TAGS           comma separated list of tags
       --artwork ARTWORK     artwork to use for song
+
+## API
+
+### sc.lame.compress
+Compress track with lame. Callback if specified while be fed a line to use to
+display progress.
+
+    sc.lame.compress(filename, artist=None,
+                               title=None,
+                               album=None,
+                               year=None,
+                               bitrate=320,
+                               callback=None)
+
+### sc.upload.upload
+Upload track to soundcloud.
+
+    sc.upload.upload(filename, sharing='private',
+                               downloadable=True,
+                               title=None,
+                               description=None,
+                               genre=None,
+                               tag_list=[],
+                               artwork=None,
+                               callback=Progressbar)
