@@ -4,6 +4,7 @@ import sys
 from datetime import date
 
 import soundcloud
+from upload import upload
 
 CLIENT_ID     = 'ffc80dc8b5bd435a15f9808724f73c40'
 CLIENT_SECRET = 'b299b6681e00dfd9f5015639c7f5fe29'
@@ -53,3 +54,8 @@ def compress_track(filename, artist=None, title=None, album='work in progress', 
         title = os.path.splitext(os.path.basename(filename))[0]
 
     os.system('lame -b %d --tt "%s" --ta "%s" --tl "%s" --ty %s "%s"' % (bitrate, title, artist, album, year, filename))
+
+def upload_track(filename, **kwargs):
+    access_token = get_settings()['access_token']
+
+    return upload(filename, access_token, **kwargs)
