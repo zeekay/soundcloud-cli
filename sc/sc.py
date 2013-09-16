@@ -4,6 +4,7 @@ import sys
 from datetime import date
 
 import soundcloud
+from __init__ import __version__
 from upload import upload
 
 CLIENT_ID     = 'ffc80dc8b5bd435a15f9808724f73c40'
@@ -107,6 +108,8 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
+
     subparsers = parser.add_subparsers()
 
     upload_parser = subparsers.add_parser('upload', help='upload track to soundcloud')
@@ -133,7 +136,9 @@ def main():
     auth_parser.set_defaults(command=command_auth)
 
     # default to upload command
-    if sys.argv[1:] and sys.argv[1] not in subparsers.choices:
+    choices = subparsers.choices.keys()
+    choices += ['-h', '--help', '-v', '--version']
+    if sys.argv[1:] and sys.argv[1] not in choices:
         sys.argv = [sys.argv[0], 'upload'] + sys.argv[1:]
 
     args = parser.parse_args()
