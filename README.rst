@@ -76,34 +76,28 @@ usage with ``--help``:
 API
 ---
 
-sc.lame.compress
-~~~~~~~~~~~~~~~~
+sc.lame.compress(filename, \*\*kwargs)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Compress track with lame. Callback if specified while be fed a line to
 use to display progress.
 
-::
+sc.api.client.get\_access\_token(username, password)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    sc.lame.compress(filename, artist=None,
-                               title=None,
-                               album=None,
-                               year=None,
-                               bitrate=320,
-                               callback=None)
+Authenticate against Soundcloud and return access token.
 
-sc.upload.upload
-~~~~~~~~~~~~~~~~
+sc.api.client.get\_client(access\_token=None)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Return soundcloud client using specified or saved access\_token.
+
+sc.api.share.share(track\_id=None, url=None, users=None)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Share a track with given users.
+
+sc.api.upload.upload(filename, \*\*kwargs)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Upload track to soundcloud.
-
-::
-
-    sc.upload.upload(filename, sharing='private',
-                               downloadable=True,
-                               title=None,
-                               description=None,
-                               genre=None,
-                               tag_list=[],
-                               artwork=None,
-                               callback=Progressbar)
-
