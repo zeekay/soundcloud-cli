@@ -46,4 +46,4 @@ def get_client(access_token=None):
     if not access_token:
         access_token = get_settings()['access_token']
 
-    return soundcloud.Client(access_token=access_token)
+    return soundcloud.Client(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, access_token=access_token)
