@@ -45,8 +45,12 @@ def command_defaults(args):
 def command_list(args):
     from .api.list import list
 
-    for track in list(username=args.username):
-        print "%s (%s)" % (track.title, track.permalink_url)
+    tracks = list(username=args.username)
+    title_len = max(len(t.title) for t in tracks)
+
+    format_spec = "{0:<%d} {1}" % (title_len + 2)
+    for track in tracks:
+        print format_spec.format(track.title, track.permalink_url)
 
 
 @utils.require_auth
