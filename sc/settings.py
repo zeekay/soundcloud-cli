@@ -24,6 +24,7 @@ class Settings(object):
         import os
 
         self.settings = {
+            'user': {},
             'users': {},
             'defaults': {}
         }

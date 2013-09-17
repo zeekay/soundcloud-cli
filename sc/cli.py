@@ -1,23 +1,25 @@
 import os
 import sys
 
-from . import settings
-from .utils import copy_to_clipboard, open_browser
+from . import settings, utils
 
 
 def command_auth(args):
     import getpass
-    from .api.client import get_access_token
+    from .api.client import authenticate
 
-    _username = getpass.getuser()
-    username = raw_input('Enter username (%s): ' % _username)
+    username = settings.user.get('name', None)
     if not username:
-        username = _username
+        username = getpass.getuser()
+    username = raw_input('Enter username (%s): ' % username)
 
     password = getpass.getpass('Enter password: ')
 
-    settings.access_token = get_access_token(username, password)
-    settings.username = username
+    client = authenticate(username, password)
+    me = client.get('/me')
+    settings.access_token = client.access_token
+    settings.user         = me.obj
+    settings.user['name'] = me.username
     settings.save()
     print 'Saved access_token.'
 
@@ -39,6 +41,15 @@ def command_defaults(args):
     print 'set %s = %s' % (key, str(value))
 
 
+@utils.require_auth
+def command_list(args):
+    from .api.list import list
+
+    for track in list(username=args.username):
+        print "%s (%s)" % (track.title, track.permalink_url)
+
+
+@utils.require_auth
 def command_share(args):
     from .api.share import share
 
@@ -55,13 +66,10 @@ def command_share(args):
     return
 
 
+@utils.require_auth
 def command_upload(args):
     from .api.upload import upload
     from .api.share import share
-
-    if settings.username is None or settings.access_token is None:
-        print 'You must authenticate with Soundcloud before uploading audio'
-        sys.exit(1)
 
     if args.compress and args.filename.endswith('.wav'):
         from .lame import compress
@@ -98,8 +106,8 @@ def command_upload(args):
     url = res['permalink_url']
 
     print url
-    open_browser(url)
-    copy_to_clipboard(url)
+    utils.open_browser(url)
+    utils.copy_to_clipboard(url)
 
     # share if defaults.share_with set or if requested explicitly
     share_with = settings.defaults.get('share_with', None)
@@ -113,6 +121,7 @@ def command_upload(args):
         for user in users:
             print '  %s (%s)' % (user.permalink, user.permalink_url)
         return
+
 
 def main():
     import argparse
@@ -131,6 +140,10 @@ def main():
     defaults_parser.add_argument('key', help='key')
     defaults_parser.add_argument('value', help='value')
     defaults_parser.set_defaults(command=command_defaults)
+
+    list_parser = subparsers.add_parser('list', help='list tracks for given user')
+    list_parser.add_argument('username', nargs='?', help='key')
+    list_parser.set_defaults(command=command_list)
 
     share_parser = subparsers.add_parser('share', help='share track with users')
     share_parser.add_argument('track_url', help='track you want to share')
@@ -168,4 +181,9 @@ def main():
             sys.argv = [sys.argv[0], 'upload'] + sys.argv[1:]
 
     args = parser.parse_args()
-    args.command(args)
+
+    try:
+        args.command(args)
+    except KeyboardInterrupt:
+        print
+        sys.exit(1)
