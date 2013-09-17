@@ -1,10 +1,13 @@
 import os
 import sys
 
+from . import settings
+from .utils import copy_to_clipboard, open_browser
+
 
 def command_auth(args):
     import getpass
-    from settings import auth
+    from .api.client import get_access_token
 
     _username = getpass.getuser()
     username = raw_input('Enter username (%s): ' % _username)
@@ -13,12 +16,14 @@ def command_auth(args):
 
     password = getpass.getpass('Enter password: ')
 
-    auth(username, password)
+    settings.access_token = get_access_token(username, password)
+    settings.username = username
+    settings.save()
     print 'Saved access_token.'
 
 
 def command_share(args):
-    from api.share import share
+    from .api.share import share
 
     users = share(args.track_url, args.users)
 
@@ -29,11 +34,10 @@ def command_share(args):
 
 
 def command_upload(args):
-    from api import upload
-    from utils import copy_to_clipboard, open_browser
+    from .api.upload import upload
 
     if args.compress and args.filename.endswith('.wav'):
-        from lame import compress
+        from .lame import compress
 
         compress(args.filename, bitrate=args.bitrate,
                                 title=args.title,
@@ -53,8 +57,9 @@ def command_upload(args):
 
     if args.tags:
         tag_list = [x.strip() for x in args.tags.split(',')]
-    else:
-        tag_list = []
+
+    if args.share_with:
+        share_with = [x.strip() for x in args.share_with.split(',')]
 
     res = upload(args.filename, sharing=sharing,
                                 downloadable=args.downloadable,
@@ -62,6 +67,7 @@ def command_upload(args):
                                 description=args.description,
                                 genre=args.genre,
                                 tag_list=tag_list,
+                                share_with=share_with,
                                 artwork=args.artwork)
 
     url = res['permalink_url']
@@ -106,6 +112,7 @@ def main():
     upload_parser.add_argument('--description', help='description of track')
     upload_parser.add_argument('--genre', help='genre of track')
     upload_parser.add_argument('--tags', help='comma separated list of tags')
+    upload_parser.add_argument('--share-with', help='comma separated list of users to share with')
     upload_parser.add_argument('--artwork', help='artwork to use for song')
     upload_parser.set_defaults(command=command_upload)
 

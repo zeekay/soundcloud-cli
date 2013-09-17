@@ -4,7 +4,7 @@ import subprocess
 import sys
 
 from datetime import date
-from settings import get_settings
+from . import settings
 
 DEFAULT_YEAR  = date.today().year
 PROGRESS_RE = re.compile(r'\((\s?\d+)%\)')
@@ -26,7 +26,7 @@ class Progressbar(object):
 
 def compress(filename, artist=None, title=None, album=None, year=None, bitrate=320, callback=Progressbar):
     if artist is None:
-        artist = get_settings()['username']
+        artist = settings.username
 
     if title is None:
         title = os.path.splitext(os.path.basename(filename))[0]
