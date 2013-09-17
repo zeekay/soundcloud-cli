@@ -14,16 +14,7 @@ Preferred method of install is ``pip``:
 
     $ pip install sc-cli
 
-After installing ``sc``, you should authenticate with Soundcloud.
-
-::
-
-    $ sc auth
-    Enter username (zk): requite
-    Enter password:
-    Saved access_token.
-
-You can run ``sc auth`` to change users later.
+After installing ``sc``, you should authenticate using ``sc auth``.
 
 Commands
 --------
@@ -37,18 +28,38 @@ Check usage for detailed arguments:
 auth
 ~~~~
 
-Authenticate against Soundcloud and save access\_token. Can be run
-multiple times to switch between users
+Authenticate against Soundcloud and save access\_token. Required to
+upload audio.
+
+::
+
+    $ sc auth
+    Enter username (zk): requite
+    Enter password:
+    Saved access_token.
+
+You can run ``sc auth`` to change users later.
 
 defaults
 ~~~~~~~~
 
 Set values to be used as defaults for commands.
 
+::
+
+    $ sc defaults share_with zeekay
+    set share_with = ['zeekay']
+
 share
 ~~~~~
 
 Share a track with a set of users on Soundcloud.
+
+::
+
+    $ sc share https://soundcloud.com/requite/honey/s-nIqsG zeekay
+    shared with:
+      zeekay (http://soundcloud.com/zeekay)
 
 upload
 ~~~~~~
@@ -60,9 +71,9 @@ you'll get the secret link for sharing:
 
 ::
 
-    $ sc upload mysong.mp3
-    uploading mysong.mp3 [==================================================] 100%
-    http://soundcloud.com/requite/mysong/s-oFATH
+    $ sc honey.wav
+    uploading honey.mp3 [==================================================] 100%
+    http://soundcloud.com/requite/honey/s-nIqsG
 
 API
 ---
