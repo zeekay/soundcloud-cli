@@ -22,6 +22,23 @@ def command_auth(args):
     print 'Saved access_token.'
 
 
+def command_defaults(args):
+    key   = args.key
+    value = args.value
+
+    known_defaults = {
+        'share_with': lambda v: [u.strip() for u in v.split(',')],
+        'bitrate': lambda v: int(v),
+    }
+
+    if known_defaults.get(key, None):
+        value = known_defaults[key](value)
+
+    settings.defaults[key] = value
+    settings.save()
+    print 'set %s = %s' % (key, str(value))
+
+
 def command_share(args):
     from .api.share import share
 
@@ -84,9 +101,13 @@ def command_upload(args):
     open_browser(url)
     copy_to_clipboard(url)
 
+    # share if defaults.share_with set or if requested explicitly
+    share_with = settings.defaults.get('share_with', None)
+
     if args.share_with:
         share_with = [x.strip() for x in args.share_with.split(',')]
 
+    if share_with:
         users = share(track_id=res['id'], users=share_with)
         print 'shared with:'
         for user in users:
@@ -106,13 +127,18 @@ def main():
     auth_parser = subparsers.add_parser('auth', help='authenticate and save access token')
     auth_parser.set_defaults(command=command_auth)
 
+    defaults_parser = subparsers.add_parser('defaults', help='configure defaults')
+    defaults_parser.add_argument('key', help='key')
+    defaults_parser.add_argument('value', help='value')
+    defaults_parser.set_defaults(command=command_defaults)
+
     share_parser = subparsers.add_parser('share', help='share track with users')
-    share_parser.add_argument('track_url', action='store', help='track you want to share')
-    share_parser.add_argument('users', action='store', nargs='?', help='users you want to share track with')
+    share_parser.add_argument('track_url', help='track you want to share')
+    share_parser.add_argument('users', nargs='?', help='users you want to share track with')
     share_parser.set_defaults(command=command_share)
 
     upload_parser = subparsers.add_parser('upload', help='upload track to soundcloud')
-    upload_parser.add_argument('filename', action='store', help='filename to upload')
+    upload_parser.add_argument('filename', help='filename to upload')
     upload_parser.add_argument('--public', action='store_true', help='make track public')
     upload_parser.add_argument('--compress', action='store_true', help='compress file')
     upload_parser.add_argument('--no-compress', action='store_false', help='do not compress file')
