@@ -2,8 +2,7 @@ sc
 ==
 
 ``sc`` is a command-line interface for Soundcloud. It allows you to
-compress and upload audio to Soundcloud, and will eventually support
-many other useful features.
+compress and upload audio to Soundcloud, among other things.
 
 Install
 -------
@@ -49,6 +48,11 @@ Set values to be used as defaults for commands.
 
     $ sc defaults share_with zeekay
     set share_with = ['zeekay']
+
+list
+~~~~
+
+List your tracks, or tracks for a given user.
 
 share
 ~~~~~
