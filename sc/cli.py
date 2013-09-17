@@ -14,20 +14,31 @@ def command_auth(args):
     import getpass
     from .api.client import authenticate
 
+    # try to detect username
     username = settings.user.get('name', None)
     if not username:
         username = getpass.getuser()
-    username = raw_input('Enter username (%s): ' % username)
 
-    password = getpass.getpass('Enter password: ')
+    # read username
+    user_input = raw_input('enter username ({0}): '.format(username))
+    if user_input:
+        username = user_input
 
+    # read password
+    password = getpass.getpass('enter password: ')
+
+    # authenticate with username/password
     client = authenticate(username, password)
+
+    # get user info
     me = client.get('/me')
+
+    # save settings
     settings.access_token = client.access_token
     settings.user         = me.obj
     settings.user['name'] = me.username
     settings.save()
-    print 'saved access_token.'
+    print 'authenticated as {0}.'.format(me.username)
 
 
 def command_defaults(args):
