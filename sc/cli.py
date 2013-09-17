@@ -25,7 +25,12 @@ def command_auth(args):
 def command_share(args):
     from .api.share import share
 
-    users = share(args.track_url, args.users)
+    if args.users:
+        users = [u.strip() for u in args.users.split(',')]
+    else:
+        users = []
+
+    users = share(url=args.track_url, users=users)
 
     print 'shared with:'
     for user in users:
@@ -35,6 +40,11 @@ def command_share(args):
 
 def command_upload(args):
     from .api.upload import upload
+    from .api.share import share
+
+    if settings.username is None or settings.access_token is None:
+        print 'You must authenticate with Soundcloud before uploading audio'
+        sys.exit(1)
 
     if args.compress and args.filename.endswith('.wav'):
         from .lame import compress
@@ -57,9 +67,8 @@ def command_upload(args):
 
     if args.tags:
         tag_list = [x.strip() for x in args.tags.split(',')]
-
-    if args.share_with:
-        share_with = [x.strip() for x in args.share_with.split(',')]
+    else:
+        tag_list = None
 
     res = upload(args.filename, sharing=sharing,
                                 downloadable=args.downloadable,
@@ -67,7 +76,6 @@ def command_upload(args):
                                 description=args.description,
                                 genre=args.genre,
                                 tag_list=tag_list,
-                                share_with=share_with,
                                 artwork=args.artwork)
 
     url = res['permalink_url']
@@ -76,6 +84,14 @@ def command_upload(args):
     open_browser(url)
     copy_to_clipboard(url)
 
+    if args.share_with:
+        share_with = [x.strip() for x in args.share_with.split(',')]
+
+        users = share(track_id=res['id'], users=share_with)
+        print 'shared with:'
+        for user in users:
+            print '  %s (%s)' % (user.permalink, user.permalink_url)
+        return
 
 def main():
     import argparse

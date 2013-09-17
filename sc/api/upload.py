@@ -3,8 +3,7 @@ import sys
 from io import BytesIO
 import requests
 
-from ..settings import get_settings
-from .share import share
+from .. import settings
 
 
 class CancelledError(Exception):
@@ -58,16 +57,14 @@ class Progressbar(object):
         sys.stdout.flush()
 
 
-def upload(filename, sharing='private', downloadable=True, title=None, description=None, genre=None, tag_list=None, artwork=None, share_with=None, callback=Progressbar):
-    access_token = get_settings()['access_token']
-
+def upload(filename, sharing='private', downloadable=True, title=None, description=None, genre=None, tag_list=None, artwork=None, callback=Progressbar):
     if not title:
         title = os.path.splitext(os.path.basename(filename))[0]
 
     filename = os.path.expanduser(filename)
 
     data = {
-        'oauth_token': access_token,
+        'oauth_token': settings.access_token,
         'track[asset_data]': (filename, open(filename, 'rb').read()),
         'track[sharing]': sharing,
         'track[downloadable]': downloadable,
@@ -109,8 +106,5 @@ def upload(filename, sharing='private', downloadable=True, title=None, descripti
     if sharing == 'private':
         secret_token = res['secret_uri'].split('secret_token=')[1]
         res['permalink_url'] = res['permalink_url'] + '/' + secret_token
-
-    if share_with:
-        share(track_id=res['id'], users=share_with)
 
     return res
