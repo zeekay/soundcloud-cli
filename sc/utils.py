@@ -1,6 +1,9 @@
 import os
 import sys
 
+from . import settings
+
+
 def copy_to_clipboard(text):
     # reliable on mac
     if sys.platform == 'darwin':
@@ -19,7 +22,17 @@ def copy_to_clipboard(text):
     r.clipboard_append(text.encode('ascii'))
     r.destroy()
 
+
 def open_browser(url):
     import webbrowser
 
     webbrowser.open_new_tab(url)
+
+
+def require_auth(f):
+    def wrapper(*args, **kwargs):
+        if settings.access_token is None:
+            print 'this command requires you to be authenticated'
+            sys.exit(1)
+        return f(*args, **kwargs)
+    return wrapper
