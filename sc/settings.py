@@ -1,49 +1,60 @@
-import json
-import os
 import sys
 
-import soundcloud
 
-CLIENT_ID     = 'ffc80dc8b5bd435a15f9808724f73c40'
-CLIENT_SECRET = 'b299b6681e00dfd9f5015639c7f5fe29'
-SC_CONF = os.path.expanduser('~/.sc')
+class InvalidSettings(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+        Exception.__init__(self, msg)
 
+    def __str__(self):
+        return self.msg
 
-def get_access_token(username, password):
-    client = soundcloud.Client(
-        client_id=CLIENT_ID,
-        client_secret=CLIENT_SECRET,
-        username=username,
-        password=password,
-        scope='non-expiring',
-    )
-
-    return client.access_token
+    __repr__ = __str__
 
 
-def auth(username, password):
-    with open(SC_CONF, 'w') as f:
-        access_token = get_access_token(username, password)
-        json.dump({'username': username, 'access_token': access_token}, f)
+class Settings(object):
+    def __init__(self, filename='~/.sc'):
+        import os
+        self.filename = os.path.expanduser(filename)
+        self.settings = None
+        self.load()
 
+    def load(self):
+        import json
+        import os
 
-def get_settings():
-    if get_settings._cache:
-        return get_settings._cache
+        if not os.path.exists(self.filename):
+            self.settings = {
+                'users': {}
+            }
+            return
 
-    if not os.path.exists(SC_CONF):
-        print 'Run auth command to authenticate and save access token.'
-        sys.exit(1)
+        with open(self.filename) as f:
+            try:
+                self.settings = json.load(f)
+            except ValueError:
+                raise InvalidSettings('Settings file is corrupt or missing')
 
-    with open(SC_CONF) as f:
-        get_settings._cache = settings = json.load(f)
+    def save(self):
+        import json
 
-    return settings
-get_settings._cache = None
+        with open(self.filename, 'w') as f:
+            json.dump(self.settings, f)
 
+    def __getattr__(self, name):
+        if name == '_attrs' or name in self._attrs:
+            raise AttributeError()
 
-def get_client(access_token=None):
-    if not access_token:
-        access_token = get_settings()['access_token']
+        return self.settings.get(name, None)
 
-    return soundcloud.Client(client_id=CLIENT_ID, client_secret=CLIENT_SECRET, access_token=access_token)
+    def __setattr__(self, name, value):
+        if name == '_attrs' or name in self._attrs:
+            return super(self.Settings, self).__setattr__(name, value)
+
+        self.settings[name] = value
+
+Settings._attrs = set(dir(Settings) + ['Settings', 'filename', 'settings'])
+Settings.InvalidSettings = InvalidSettings
+Settings.Settings = Settings
+
+sys.modules[__name__] = Settings()
