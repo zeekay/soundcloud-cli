@@ -5,6 +5,7 @@ import requests
 
 from settings import get_settings
 
+
 class CancelledError(Exception):
     def __init__(self, msg):
         self.msg = msg
@@ -91,7 +92,7 @@ def upload(filename, sharing='private', downloadable=True, title=None, descripti
         "Content-Type": content_type
     }
 
-    body = BufferReader(data, callback=callback(', '.join(f for f in [filename, artwork] if f)))
+    body = BufferReader(data, callback=callback(', '.join(os.path.basename(f) for f in [filename, artwork] if f)))
 
     res = requests.post('https://api.soundcloud.com/tracks.json', data=body, headers=headers)
     print
