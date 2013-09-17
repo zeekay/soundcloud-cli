@@ -4,6 +4,12 @@ import sys
 from . import settings, utils
 
 
+def print_shared_with(users):
+    print 'shared with:'
+    for user in users:
+        print '  {0} ({0})'.format(user.permalink, user.permalink_url)
+
+
 def command_auth(args):
     import getpass
     from .api.client import authenticate
@@ -21,7 +27,7 @@ def command_auth(args):
     settings.user         = me.obj
     settings.user['name'] = me.username
     settings.save()
-    print 'Saved access_token.'
+    print 'saved access_token.'
 
 
 def command_defaults(args):
@@ -38,17 +44,35 @@ def command_defaults(args):
 
     settings.defaults[key] = value
     settings.save()
-    print 'set %s = %s' % (key, str(value))
+    print 'set {0} = {1}'.format(key, str(value))
 
 
 @utils.require_auth
 def command_list(args):
     from .api.list import list
+    from .api.client import get_client
 
-    tracks = list(username=args.username)
+    client   = get_client()
+    username = args.username
+
+    if not username:
+        user_id  = settings.user.get('id')
+        username = settings.user.get('name')
+    else:
+        user = settings.users.get(username, None)
+        if user:
+            user_id  = user['id']
+        else:
+            user = client.get('/resolve', url='https://soundcloud/{0}'.format(username))
+            user_id = user.id
+
+    tracks = list(user_id)
+
+    # find longest title to build formatting string
     title_len = max(len(t.title) for t in tracks)
+    format_spec = "  {{0:<{0}}} {{1}}".format(title_len + 2)
 
-    format_spec = "{0:<%d} {1}" % (title_len + 2)
+    print 'tracks by {0}:'.format(username)
     for track in tracks:
         print format_spec.format(track.title, track.permalink_url)
 
@@ -63,11 +87,7 @@ def command_share(args):
         users = []
 
     users = share(url=args.track_url, users=users)
-
-    print 'shared with:'
-    for user in users:
-        print '  %s (%s)' % (user.permalink, user.permalink_url)
-    return
+    print_shared_with(users)
 
 
 @utils.require_auth
@@ -121,10 +141,7 @@ def command_upload(args):
 
     if share_with:
         users = share(track_id=res['id'], users=share_with)
-        print 'shared with:'
-        for user in users:
-            print '  %s (%s)' % (user.permalink, user.permalink_url)
-        return
+        print_shared_with(users)
 
 
 def main():
