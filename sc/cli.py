@@ -17,8 +17,19 @@ def command_auth(args):
     print 'Saved access_token.'
 
 
+def command_share(args):
+    from api.share import share
+
+    users = share(args.track_url, args.users)
+
+    print 'shared with:'
+    for user in users:
+        print '  %s (%s)' % (user.permalink, user.permalink_url)
+    return
+
+
 def command_upload(args):
-    from upload import upload
+    from api import upload
     from utils import copy_to_clipboard, open_browser
 
     if args.compress and args.filename.endswith('.wav'):
@@ -72,6 +83,11 @@ def main():
 
     auth_parser = subparsers.add_parser('auth', help='authenticate and save access token')
     auth_parser.set_defaults(command=command_auth)
+
+    share_parser = subparsers.add_parser('share', help='share track with users')
+    share_parser.add_argument('track_url', action='store', help='track you want to share')
+    share_parser.add_argument('users', action='store', nargs='?', help='users you want to share track with')
+    share_parser.set_defaults(command=command_share)
 
     upload_parser = subparsers.add_parser('upload', help='upload track to soundcloud')
     upload_parser.add_argument('filename', action='store', help='filename to upload')
