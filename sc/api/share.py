@@ -18,11 +18,6 @@ def share(track_id=None, url=None, users=None):
 
     permissions = {'user_id': []}
 
-    # cache looked up users in settings
-    if not settings.users:
-        settings.users = {}
-    settings.save()
-
     for username in users:
         # check cache for user
         user = settings.users.get(username, None)
