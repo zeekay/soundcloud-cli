@@ -18,7 +18,7 @@ Check usage for detailed arguments:
 Authenticate against Soundcloud and save access_token. Required to upload audio.
 
     $ sc auth
-    Enter username (zk): requite
+    Enter username (zeekay): requite
     Enter password:
     Saved access_token.
 
@@ -32,6 +32,15 @@ Set values to be used as defaults for commands.
 
 ### list
 List your tracks, or tracks for a given user.
+
+    $ sc list sinerise
+    tracks by sinerise:
+      Dane Pedersen - Space Jambience (Sinerise Remix)   http://soundcloud.com/sinerise/space-jambience-remix
+      Strewn (51st Vocal Mix) feat. delica               http://soundcloud.com/sinerise/strewn-51st-vocal-mix
+      Calling (requite's bass refix)                     http://soundcloud.com/sinerise/calling-refix
+      Can't Save Me                                      http://soundcloud.com/sinerise/cant-save-me
+      Strewn                                             http://soundcloud.com/sinerise/strewn
+      Calling (Original)                                 http://soundcloud.com/sinerise/calling
 
 ### share
 Share a track with a set of users on Soundcloud.
@@ -49,21 +58,3 @@ link for sharing:
     $ sc honey.wav
     uploading honey.mp3 [==================================================] 100%
     http://soundcloud.com/requite/honey/s-nIqsG
-
-## API
-
-### sc.lame.compress(filename, **kwargs)
-Compress track with lame. Callback if specified while be fed a line to use to
-display progress.
-
-### sc.api.client.get_access_token(username, password)
-Authenticate against Soundcloud and return access token.
-
-### sc.api.client.get_client(access_token=None)
-Return soundcloud client using specified or saved access_token.
-
-### sc.api.share.share(track_id=None, url=None, users=None)
-Share a track with given users.
-
-### sc.api.upload.upload(filename, **kwargs)
-Upload track to soundcloud.
