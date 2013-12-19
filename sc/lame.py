@@ -24,7 +24,7 @@ class Progressbar(object):
         sys.stdout.flush()
 
 
-def compress(filename, artist=None, title=None, album=None, year=None, bitrate=320, callback=Progressbar):
+def compress(filename, artist='', title='', album='', year='', bitrate=320, callback=Progressbar):
     if artist is None:
         artist = settings.username
 
