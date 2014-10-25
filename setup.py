@@ -14,10 +14,17 @@ setup(
     author='Zach Kelling',
     author_email='zk@monoid.io',
     url='https://github.com/zeekay/soundcloud-cli',
-    description='Soundcloud CLI app',
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
     scripts=['bin/sc', 'bin/soundcloud-cli'],
     install_requires=['soundcloud'],
+    license='LICENSE',
+    description='Soundcloud command-line utility',
+    long_description=open('README.rst').read(),
+    classifiers=[
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+    ],
 )
