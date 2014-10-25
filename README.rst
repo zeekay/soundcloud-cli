@@ -1,8 +1,8 @@
-sc
-==
+soundcloud-cli
+==============
 
-``sc`` is a command-line interface for Soundcloud. It allows you to
-compress and upload audio to Soundcloud, among other things.
+``soundcloud-cli`` is a command-line interface for Soundcloud. It allows
+you to compress and upload audio to Soundcloud, among other things.
 
 Install
 -------
@@ -11,7 +11,7 @@ Preferred method of install is ``pip``:
 
 ::
 
-    $ pip install sc-cli
+    $ pip install soundcloud-cli
 
 After installing ``sc``, you should authenticate using ``sc auth``.
 
