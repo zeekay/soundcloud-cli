@@ -1,6 +1,6 @@
 # soundcloud-cli
-`soundcloud-cli` is a command-line interface for Soundcloud. It allows you to compress and
-upload audio to Soundcloud, among other things.
+`soundcloud-cli` is a command-line interface for [SoundCloud](http://soundcloud.com). It allows you to compress and
+upload audio to SoundCloud, among other things.
 
 ## Install
 Preferred method of install is `pip`:
@@ -15,7 +15,7 @@ Check usage for detailed arguments:
     $ sc --help
 
 ### auth
-Authenticate against Soundcloud and save access_token. Required to upload audio.
+Authenticate against SoundCloud and save access_token. Required to upload audio.
 
     $ sc auth
     Enter username (zeekay): requite
@@ -43,14 +43,14 @@ List your tracks, or tracks for a given user.
       Calling (Original)                                 http://soundcloud.com/sinerise/calling
 
 ### share
-Share a track with a set of users on Soundcloud.
+Share a track with a set of users on SoundCloud.
 
     $ sc share https://soundcloud.com/requite/honey/s-nIqsG zeekay
     shared with:
       zeekay (http://soundcloud.com/zeekay)
 
 ### upload
-You can use the `sc upload` command to upload audio to Soundcloud. If you
+You can use the `sc upload` command to upload audio to SoundCloud. If you
 specify a `.wav` file `sc` will compress the audio for you (if `lame` is
 installed). By default uploaded audio is set to private, and you'll get the secret
 link for sharing:
