@@ -186,8 +186,6 @@ def main():
     upload_parser.add_argument('filename', help='filename to upload')
     upload_parser.add_argument('--public', action='store_true', help='make track public')
     upload_parser.add_argument('--compress', action='store_true', help='compress file')
-    upload_parser.add_argument('--no-compress', action='store_false', help='do not compress file')
-    upload_parser.set_defaults(compress=True)
     upload_parser.add_argument('--downloadable', action='store_true', help='allow downloads')
     upload_parser.add_argument('--no-downloadable', action='store_false', help='disallow downloads')
     upload_parser.set_defaults(downloadable=True)
