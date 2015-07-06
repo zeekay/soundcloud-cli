@@ -74,7 +74,7 @@ def command_list(args):
         if user:
             user_id  = user['id']
         else:
-            user = client.get('/resolve', url='https://soundcloud/{0}'.format(username))
+            user = client.get('/resolve', url='https://soundcloud.com/{0}'.format(username))
             user_id = user.id
 
     tracks = list(user_id)
