@@ -20,7 +20,7 @@ def command_auth(args):
         username = getpass.getuser()
 
     # read username
-    user_input = raw_input('enter username ({0}): '.format(username))
+    user_input = raw_input(u'enter username ({0}): '.format(username.decode('utf-8')))
     if user_input:
         username = user_input
 
