@@ -1,7 +1,9 @@
+from __future__ import unicode_literals
+
 import os
+import requests
 import sys
 from io import BytesIO
-import requests
 
 from .. import settings
 

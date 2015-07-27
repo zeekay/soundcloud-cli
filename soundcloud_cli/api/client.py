@@ -1,5 +1,7 @@
-from .. import settings
 import soundcloud
+
+from .. import settings
+
 
 CLIENT_ID     = 'ffc80dc8b5bd435a15f9808724f73c40'
 CLIENT_SECRET = 'b299b6681e00dfd9f5015639c7f5fe29'
