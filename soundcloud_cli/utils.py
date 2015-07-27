@@ -32,7 +32,7 @@ def open_browser(url):
 def require_auth(f):
     def wrapper(*args, **kwargs):
         if settings.access_token is None:
-            print 'this command requires you to be authenticated'
+            print('this command requires you to be authenticated')
             sys.exit(1)
         return f(*args, **kwargs)
     return wrapper

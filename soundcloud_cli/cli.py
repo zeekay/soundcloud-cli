@@ -1,13 +1,20 @@
+from __future__ import unicode_literals
+
 import os
 import sys
 
 from . import settings, utils
 
+try:
+    input = raw_input
+except NameError:
+    pass
+
 
 def print_shared_with(users):
-    print 'shared with:'
+    print('shared with:')
     for user in users:
-        print '  {0} ({0})'.format(user.permalink, user.permalink_url)
+        print('  {0} ({0})'.format(user.permalink, user.permalink_url))
 
 
 def command_auth(args):
@@ -20,7 +27,7 @@ def command_auth(args):
         username = getpass.getuser()
 
     # read username
-    user_input = raw_input(u'enter username ({0}): '.format(username.decode('utf-8')))
+    user_input = input('enter username ({0}): '.format(username))
     if user_input:
         username = user_input
 
@@ -38,7 +45,7 @@ def command_auth(args):
     settings.user         = me.obj
     settings.user['name'] = me.username
     settings.save()
-    print 'authenticated as {0}.'.format(me.username)
+    print('authenticated as {0}.'.format(me.username))
 
 
 def command_defaults(args):
@@ -55,7 +62,7 @@ def command_defaults(args):
 
     settings.defaults[key] = value
     settings.save()
-    print 'set {0} = {1}'.format(key, str(value))
+    print('set {0} = {1}'.format(key, unicode(value)))
 
 
 @utils.require_auth
@@ -83,9 +90,9 @@ def command_list(args):
     title_len = max(len(t.title) for t in tracks)
     format_spec = "  {{0:<{0}}} {{1}}".format(title_len + 2)
 
-    print 'tracks by {0}:'.format(username)
+    print('tracks by {0}:'.format(username))
     for track in tracks:
-        print format_spec.format(track.title, track.permalink_url)
+        print(format_spec.format(track.title, track.permalink_url))
 
 
 @utils.require_auth
@@ -140,7 +147,7 @@ def command_upload(args):
 
     url = res['permalink_url']
 
-    print url
+    print(url)
     utils.open_browser(url)
     utils.copy_to_clipboard(url)
 
@@ -158,7 +165,7 @@ def command_upload(args):
 def main():
     import argparse
 
-    from __init__ import __version__
+    from .__init__ import __version__
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + __version__)
@@ -203,7 +210,7 @@ def main():
 
     # default to upload command
     if sys.argv[1:]:
-        choices = subparsers.choices.keys()
+        choices = list(subparsers.choices.keys())
         choices += ['-h', '--help', '-v', '--version']
 
         # unless recognized command is passed, treat first argument as file to upload
@@ -213,7 +220,13 @@ def main():
     args = parser.parse_args()
 
     try:
-        args.command(args)
+        cmd = args.command
+    except AttributeError:
+        parser.print_help()
+        return
+
+    try:
+        cmd(args)
     except KeyboardInterrupt:
-        print
+        print('')
         sys.exit(1)

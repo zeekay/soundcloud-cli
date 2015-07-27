@@ -1,3 +1,3 @@
 __version__ = '0.2.7'
 
-import api
+from . import api

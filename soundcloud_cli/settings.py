@@ -34,7 +34,7 @@ class Settings(object):
 
         with open(self.filename) as f:
             try:
-                for k,v in json.load(f).iteritems():
+                for k,v in json.load(f).items():
                     self.settings[k] = v
             except ValueError:
                 raise InvalidSettings('Settings file is corrupt or missing')
