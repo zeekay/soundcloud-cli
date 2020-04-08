@@ -37,7 +37,7 @@ class BufferReader(BytesIO):
             try:
                 self._callback(self._len, self._progress)
             except Exception as e:
-                print e
+                print(e)
                 raise CancelledError('The upload was cancelled.')
         return chunk
 
@@ -100,9 +100,9 @@ def upload(filename, sharing='private', downloadable=True, title=None, descripti
     if res.ok:
         res = res.json()
     else:
-        print res.status_code
-        print res.headers
-        print res.text
+        print(res.status_code)
+        print(res.headers)
+        print(res.text)
         return
 
     if sharing == 'private':
