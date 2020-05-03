@@ -148,8 +148,9 @@ def command_upload(args):
     url = res['permalink_url']
 
     print(url)
-    utils.open_browser(url)
-    utils.copy_to_clipboard(url)
+    if not args.quiet:
+        utils.open_browser(url)
+        utils.copy_to_clipboard(url)
 
     # share if defaults.share_with set or if requested explicitly
     share_with = settings.defaults.get('share_with', None)
@@ -206,6 +207,7 @@ def main():
     upload_parser.add_argument('--tags', help='comma separated list of tags')
     upload_parser.add_argument('--share-with', help='comma separated list of users to share with')
     upload_parser.add_argument('--artwork', help='artwork to use for song')
+    upload_parser.add_argument('--quiet', action='store_true', help='do not open browser or copy link after upload')
     upload_parser.set_defaults(command=command_upload)
 
     # default to upload command
