@@ -17,7 +17,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    scripts=['bin/sc', 'bin/soundcloud-cli'],
+    scripts=['bin/sc-cli', 'bin/soundcloud-cli'],
     install_requires=['soundcloud'],
     license='MIT',
     description='Soundcloud command-line utility',
