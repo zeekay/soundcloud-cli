@@ -1,4 +1,7 @@
 # soundcloud-cli
+
+[![Open in Hanzo](https://hanzo.app/badges/open-in-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/zeekay/soundcloud-cli&ref=master&action=open) [![Edit with Hanzo](https://hanzo.app/badges/edit-with-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/zeekay/soundcloud-cli&ref=master&action=edit)
+
 `soundcloud-cli` is a command-line interface for [SoundCloud](http://soundcloud.com). It allows you to compress and
 upload audio to SoundCloud, among other things.
 
